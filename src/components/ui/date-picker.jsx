@@ -1,29 +1,35 @@
 "use client"
 
 import * as React from "react"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { Input } from "./input"
+import { cn } from "../../lib/utils"
 
-export function DatePicker({
-  date,
-  onSelect,
-  className,
-  disabled,
-}) {
+export function DatePicker({ value, onChange, className, ...props }) {
+  // Convert date to YYYY-MM-DD format for the input
+  const formatDateForInput = (date) => {
+    if (!date) return ""
+    
+    const dateObj = date instanceof Date ? date : new Date(date)
+    if (isNaN(dateObj.getTime())) return ""
+    
+    return dateObj.toISOString().split('T')[0]
+  }
+
+  const handleChange = (e) => {
+    const inputDate = e.target.value
+    if (inputDate && onChange) {
+      const newDate = new Date(inputDate)
+      onChange(newDate)
+    }
+  }
+
   return (
-    <input
+    <Input
       type="date"
-      value={date ? format(date, 'yyyy-MM-dd') : ''}
-      onChange={(e) => {
-        const newDate = e.target.value ? new Date(e.target.value) : null
-        onSelect(newDate)
-      }}
-      className={cn(
-        "flex h-9 w-[200px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-        className
-      )}
-      disabled={disabled}
+      value={formatDateForInput(value)}
+      onChange={handleChange}
+      className={cn("border-border/50 focus-visible:ring-primary", className)}
+      {...props}
     />
   )
 }
-

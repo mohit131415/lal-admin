@@ -1,63 +1,79 @@
-import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import ErrorBoundary from './components/ErrorBoundary';
-import Layout from '@/components/layout/Layout';
-import Login from '@/components/auth/Login';
-import ForgotPassword from '@/components/auth/ForgotPassword';
-import Dashboard from '@/components/dashboard/Dashboard';
-import BlogPosts from '@/components/blog/BlogPosts';
-import ContactResponses from '@/components/contact/ContactResponses';
-import Resources from '@/components/resources/Resources';
-import Newsletter from '@/components/newsletter/Newsletter';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
-
-// Public route component - redirects to dashboard if already authenticated
-function PublicRoute({ children }) {
-  const { isAuthenticated } = useAuth();
-  const location = useLocation();
-  
-  if (isAuthenticated) {
-    return <Navigate to={location.state?.from?.pathname || '/'} replace />;
-  }
-
-  return children;
-}
+import { Routes, Route } from "react-router-dom"
+import Home from "./pages/Home"
+import MarketPage from "./pages/MarketPage"
+import Leaderboard from "./pages/Leaderboard"
+import Subscription from "./pages/Subscription"
+import AdminLogin from "./pages/admin/login"
+import AdminDashboard from "./pages/admin/dashboard"
+import MarketForm from "./pages/admin/market-form"
+import { Layout } from "./components/layout"
+import { Toaster } from "./components/ui/toaster"
+import AllMarkets from "./pages/AllMarkets"
+import PurchaseSuccessful from "./pages/PurchaseSuccessful"
 
 function App() {
   return (
-    <ErrorBoundary>
+    <>
       <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        } />
-        <Route path="/auth/forgot-password" element={
-          <PublicRoute>
-            <ForgotPassword isPublic={true} />
-          </PublicRoute>
-        } />
+        {/* Public routes with layout */}
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <Home />
+            </Layout>
+          }
+        />
+        <Route
+          path="/market/:id"
+          element={
+            <Layout>
+              <MarketPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/markets"
+          element={
+            <Layout>
+              <AllMarkets />
+            </Layout>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <Layout>
+              <Leaderboard />
+            </Layout>
+          }
+        />
+        <Route
+          path="/subscription"
+          element={
+            <Layout>
+              <Subscription />
+            </Layout>
+          }
+        />
+        <Route
+          path="/purchase-successful"
+          element={
+            <Layout>
+              <PurchaseSuccessful />
+            </Layout>
+          }
+        />
 
-        {/* Protected routes */}
-        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route index element={<Dashboard />} />
-          <Route path="blog-posts" element={<BlogPosts />} />
-          <Route path="contact-responses" element={<ContactResponses />} />
-          <Route path="newsletter" element={<Newsletter />} />
-          <Route path="resources" element={<Resources />} />
-          <Route path="settings/forgot-password" element={<ForgotPassword isPublic={false} />} />
-        </Route>
-
-        {/* Catch all route - redirect to dashboard if authenticated, login if not */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Admin routes without layout */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/markets/new" element={<MarketForm />} />
+        <Route path="/admin/markets/edit/:id" element={<MarketForm />} />
       </Routes>
-      <ToastContainer />
-    </ErrorBoundary>
-  );
+      <Toaster />
+    </>
+  )
 }
 
-export default App;
+export default App
